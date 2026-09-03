@@ -1,0 +1,903 @@
+{
+  "manifest_schema_version": 3,
+  "sdk_version": "5.13.1",
+  "app_id": "smartsheet-connector",
+  "version": "0.1.0",
+  "name": "Smartsheet",
+  "description": "Official Imperal connector for Smartsheet (C25. Project & Work Management). Manage operations securely.",
+  "icon": "icon.svg",
+  "actions_explicit": true,
+  "system": false,
+  "capabilities": [
+    "smartsheet:manage"
+  ],
+  "tools": [
+    {
+      "name": "connect_smartsheet",
+      "description": "Connect your own Smartsheet account by saving your API Access Token.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "create:connection"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "label": {
+            "default": "",
+            "description": "Friendly connection label, e.g. Operations Smartsheet.",
+            "title": "Label",
+            "type": "string"
+          },
+          "access_token": {
+            "description": "Smartsheet generated API access token (Bearer).",
+            "title": "Access Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token"
+        ],
+        "title": "ConnectSmartsheetParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "id": {
+            "description": "Connection ID",
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "description": "Connection label",
+            "title": "Label",
+            "type": "string"
+          },
+          "status": {
+            "default": "connected",
+            "description": "Status",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "ConnectResult",
+        "type": "object"
+      },
+      "event": "smartsheet-connector.connect_smartsheet",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "list_connections",
+      "description": "List connected Smartsheet accounts without exposing credentials.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "description": "Empty parameter model.",
+        "properties": {},
+        "title": "NoParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "SmartsheetConnection": {
+            "properties": {
+              "id": {
+                "description": "Connection ID",
+                "title": "Id",
+                "type": "string"
+              },
+              "label": {
+                "description": "Connection label",
+                "title": "Label",
+                "type": "string"
+              },
+              "status": {
+                "default": "connected",
+                "description": "Connection status",
+                "title": "Status",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ],
+            "title": "SmartsheetConnection",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "connections": {
+            "items": {
+              "$ref": "#/$defs/SmartsheetConnection"
+            },
+            "title": "Connections",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "title": "ConnectionList",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "disconnect_smartsheet",
+      "description": "Disconnect a Smartsheet account.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "delete:connection"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "description": "Connection ID to remove.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "connection_id"
+        ],
+        "title": "DisconnectSmartsheetParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "success": {
+            "default": true,
+            "title": "Success",
+            "type": "boolean"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "DisconnectResult",
+        "type": "object"
+      },
+      "event": "smartsheet-connector.disconnect_smartsheet",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "audit_smartsheet_health",
+      "description": "Audit Smartsheet connectivity, user identity, and accessible sheets.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Optional connection ID.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "AuditHealthParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "status": {
+            "description": "Audit status: healthy, degraded, or error",
+            "title": "Status",
+            "type": "string"
+          },
+          "user": {
+            "default": "Unknown",
+            "description": "User or organization",
+            "title": "User",
+            "type": "string"
+          },
+          "sheets_count": {
+            "default": 0,
+            "description": "Accessible sheets count",
+            "title": "Sheets Count",
+            "type": "integer"
+          },
+          "summary": {
+            "description": "Human-readable summary",
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "summary"
+        ],
+        "title": "HealthAuditResult",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "list_sheets",
+      "description": "List sheets in the connected Smartsheet account.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Optional connection ID.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "include_all": {
+            "default": true,
+            "description": "Whether to include all sheets without paging.",
+            "title": "Include All",
+            "type": "boolean"
+          }
+        },
+        "title": "ListSheetsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "title": "GenericListResult",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "get_sheet",
+      "description": "Get details of a sheet by sheet ID.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "sheet_id": {
+            "description": "Smartsheet sheet ID.",
+            "title": "Sheet Id",
+            "type": "string"
+          },
+          "connection_id": {
+            "default": "",
+            "description": "Optional connection ID.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sheet_id"
+        ],
+        "title": "GetSheetParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Id"
+          }
+        },
+        "title": "GenericRecordResult",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "create_sheet",
+      "description": "Create a new sheet with columns in Smartsheet.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "create:sheet"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "name": {
+            "description": "Sheet name.",
+            "title": "Name",
+            "type": "string"
+          },
+          "columns": {
+            "description": "List of columns definitions (title, type: TEXT_NUMBER, DATE, CHECKBOX, etc.).",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "connection_id": {
+            "default": "",
+            "description": "Optional connection ID.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "columns"
+        ],
+        "title": "CreateSheetParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Id"
+          }
+        },
+        "title": "GenericRecordResult",
+        "type": "object"
+      },
+      "event": "smartsheet-connector.create_sheet",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "delete_sheet",
+      "description": "Delete a sheet from Smartsheet.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "delete:sheet"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "sheet_id": {
+            "description": "Smartsheet sheet ID to delete.",
+            "title": "Sheet Id",
+            "type": "string"
+          },
+          "connection_id": {
+            "default": "",
+            "description": "Optional connection ID.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sheet_id"
+        ],
+        "title": "DeleteSheetParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "success": {
+            "default": true,
+            "title": "Success",
+            "type": "boolean"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "DeleteResult",
+        "type": "object"
+      },
+      "event": "smartsheet-connector.delete_sheet",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "add_rows",
+      "description": "Add one or more rows to a sheet.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "create:row"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "sheet_id": {
+            "description": "Target sheet ID.",
+            "title": "Sheet Id",
+            "type": "string"
+          },
+          "rows": {
+            "description": "List of rows to add. Each row contains 'cells': [{'columnId': ..., 'value': ...}].",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "connection_id": {
+            "default": "",
+            "description": "Optional connection ID.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sheet_id",
+          "rows"
+        ],
+        "title": "AddRowsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "title": "GenericListResult",
+        "type": "object"
+      },
+      "event": "smartsheet-connector.add_rows",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "update_rows",
+      "description": "Update existing rows in a sheet.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "update:row"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "sheet_id": {
+            "description": "Target sheet ID.",
+            "title": "Sheet Id",
+            "type": "string"
+          },
+          "rows": {
+            "description": "List of rows to update with their row ID and cell updates.",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "connection_id": {
+            "default": "",
+            "description": "Optional connection ID.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sheet_id",
+          "rows"
+        ],
+        "title": "UpdateRowsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "title": "GenericListResult",
+        "type": "object"
+      },
+      "event": "smartsheet-connector.update_rows",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "delete_rows",
+      "description": "Delete rows from a sheet by row IDs.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "delete:row"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "sheet_id": {
+            "description": "Target sheet ID.",
+            "title": "Sheet Id",
+            "type": "string"
+          },
+          "row_ids": {
+            "description": "List of numeric row IDs to delete.",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Row Ids",
+            "type": "array"
+          },
+          "connection_id": {
+            "default": "",
+            "description": "Optional connection ID.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sheet_id",
+          "row_ids"
+        ],
+        "title": "DeleteRowsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "success": {
+            "default": true,
+            "title": "Success",
+            "type": "boolean"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "DeleteResult",
+        "type": "object"
+      },
+      "event": "smartsheet-connector.delete_rows",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "list_workspaces",
+      "description": "List workspaces in Smartsheet.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Optional connection ID.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "ListWorkspacesParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "title": "GenericListResult",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "get_workspace",
+      "description": "Get details of a workspace by workspace ID.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "workspace_id": {
+            "description": "Workspace ID.",
+            "title": "Workspace Id",
+            "type": "string"
+          },
+          "connection_id": {
+            "default": "",
+            "description": "Optional connection ID.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_id"
+        ],
+        "title": "GetWorkspaceParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Id"
+          }
+        },
+        "title": "GenericRecordResult",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    },
+    {
+      "name": "create_webhook",
+      "description": "Create a webhook subscription in Smartsheet.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "create:webhook"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "name": {
+            "description": "Webhook name.",
+            "title": "Name",
+            "type": "string"
+          },
+          "callback_url": {
+            "description": "HTTPS callback URL.",
+            "title": "Callback Url",
+            "type": "string"
+          },
+          "scope": {
+            "default": "sheet",
+            "description": "Scope: sheet or workspace.",
+            "title": "Scope",
+            "type": "string"
+          },
+          "scope_object_id": {
+            "description": "Target sheet or workspace ID.",
+            "title": "Scope Object Id",
+            "type": "integer"
+          },
+          "events": {
+            "description": "Events to subscribe to, e.g. ['*.*'].",
+            "items": {
+              "type": "string"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "connection_id": {
+            "default": "",
+            "description": "Optional connection ID.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "callback_url",
+          "scope_object_id"
+        ],
+        "title": "CreateWebhookParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Id"
+          }
+        },
+        "title": "GenericRecordResult",
+        "type": "object"
+      },
+      "event": "smartsheet-connector.create_webhook",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "tool_smartsheet-connector_chat"
+    }
+  ],
+  "signals": [],
+  "schedules": [],
+  "required_scopes": [],
+  "icon_size_bytes": 345,
+  "lifecycle": {
+    "health_check": {
+      "interval_sec": 60
+    }
+  },
+  "panels": [
+    {
+      "panel_id": "smartsheet_sidebar",
+      "slot": "left",
+      "title": "",
+      "tree": {},
+      "icon": "",
+      "refresh": "manual",
+      "center_overlay": false
+    },
+    {
+      "panel_id": "smartsheet_settings",
+      "slot": "center",
+      "title": "",
+      "tree": {},
+      "icon": "",
+      "refresh": "manual",
+      "center_overlay": false
+    }
+  ],
+  "pricing": {
+    "model": "per_action",
+    "currency": "tokens",
+    "monthly_price": 0,
+    "revenue_split_dev": 70,
+    "free_tools": [
+      "connect_smartsheet",
+      "list_connections",
+      "disconnect_smartsheet"
+    ],
+    "tool_prices": {
+      "connect_smartsheet": 0,
+      "list_connections": 0,
+      "disconnect_smartsheet": 0,
+      "audit_smartsheet_health": 40,
+      "list_sheets": 8,
+      "get_sheet": 8,
+      "create_sheet": 16,
+      "delete_sheet": 16,
+      "add_rows": 16,
+      "update_rows": 16,
+      "delete_rows": 16,
+      "list_workspaces": 8,
+      "get_workspace": 8,
+      "create_webhook": 16
+    }
+  }
+}
