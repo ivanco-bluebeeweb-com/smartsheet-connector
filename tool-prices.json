@@ -1,16 +1,19 @@
 {
-  "connect_smartsheet": 0,
-  "list_connections": 0,
-  "disconnect_smartsheet": 0,
-  "audit_smartsheet_health": 40,
-  "list_sheets": 8,
-  "get_sheet": 8,
-  "create_sheet": 16,
-  "delete_sheet": 16,
-  "add_rows": 16,
-  "update_rows": 16,
-  "delete_rows": 16,
-  "list_workspaces": 8,
-  "get_workspace": 8,
-  "create_webhook": 16
+  "pricing_model": "per_action",
+  "tool_prices": {
+    "connect_smartsheet": 0,
+    "list_connections": 0,
+    "disconnect_smartsheet": 0,
+    "audit_smartsheet_health": 40,
+    "list_sheets": 8,
+    "get_sheet": 8,
+    "create_sheet": 16,
+    "delete_sheet": 16,
+    "add_rows": 16,
+    "update_rows": 16,
+    "delete_rows": 16,
+    "list_workspaces": 8,
+    "get_workspace": 8,
+    "create_webhook": 16
+  }
 }
