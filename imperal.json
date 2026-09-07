@@ -899,5 +899,12 @@
       "get_workspace": 8,
       "create_webhook": 16
     }
-  }
+  },
+  "secrets": [
+    {
+      "name": "smartsheet_connections",
+      "description": "Stored encrypted connections and credentials for smartsheet-connector",
+      "required": false
+    }
+  ]
 }
