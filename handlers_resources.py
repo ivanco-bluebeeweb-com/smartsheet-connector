@@ -24,7 +24,7 @@ async def audit_smartsheet_health(ctx, params: AuditHealthParams) -> ActionResul
     try:
         user = await client.get_current_user()
         sheets = await client.list_sheets()
-        return ActionResult.ok(
+        return ActionResult.success(
             {
                 "status": "healthy",
                 "user": user.get("email", "Unknown"),
@@ -48,7 +48,7 @@ async def list_sheets(ctx, params: ListSheetsParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         sheets = await client.list_sheets(include_all=params.include_all)
-        return ActionResult.ok({"items": sheets, "count": len(sheets)}, summary=f"Found {len(sheets)} sheet(s).")
+        return ActionResult.success({"items": sheets, "count": len(sheets)}, summary=f"Found {len(sheets)} sheet(s).")
     except Exception as e:
         return ActionResult.error(f"Error listing sheets: {e}")
 
@@ -64,7 +64,7 @@ async def get_sheet(ctx, params: GetSheetParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         sheet = await client.get_sheet(sheet_id=params.sheet_id)
-        return ActionResult.ok({"data": sheet, "id": str(sheet.get("id"))}, summary=f"Retrieved sheet {params.sheet_id}.")
+        return ActionResult.success({"data": sheet, "id": str(sheet.get("id"))}, summary=f"Retrieved sheet {params.sheet_id}.")
     except Exception as e:
         return ActionResult.error(f"Error getting sheet: {e}")
 
@@ -82,7 +82,7 @@ async def create_sheet(ctx, params: CreateSheetParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         res = await client.create_sheet(name=params.name, columns=params.columns)
-        return ActionResult.ok({"data": res, "id": str(res.get("id"))}, summary=f"Created sheet '{params.name}'.")
+        return ActionResult.success({"data": res, "id": str(res.get("id"))}, summary=f"Created sheet '{params.name}'.")
     except Exception as e:
         return ActionResult.error(f"Error creating sheet: {e}")
 
@@ -100,7 +100,7 @@ async def delete_sheet(ctx, params: DeleteSheetParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         await client.delete_sheet(sheet_id=params.sheet_id)
-        return ActionResult.ok({"success": True, "message": f"Sheet {params.sheet_id} deleted."}, summary=f"Deleted sheet {params.sheet_id}.")
+        return ActionResult.success({"success": True, "message": f"Sheet {params.sheet_id} deleted."}, summary=f"Deleted sheet {params.sheet_id}.")
     except Exception as e:
         return ActionResult.error(f"Error deleting sheet: {e}")
 
@@ -118,7 +118,7 @@ async def add_rows(ctx, params: AddRowsParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         rows = await client.add_rows(sheet_id=params.sheet_id, rows=params.rows)
-        return ActionResult.ok({"items": rows, "count": len(rows)}, summary=f"Added {len(rows)} row(s) to sheet {params.sheet_id}.")
+        return ActionResult.success({"items": rows, "count": len(rows)}, summary=f"Added {len(rows)} row(s) to sheet {params.sheet_id}.")
     except Exception as e:
         return ActionResult.error(f"Error adding rows: {e}")
 
@@ -136,7 +136,7 @@ async def update_rows(ctx, params: UpdateRowsParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         rows = await client.update_rows(sheet_id=params.sheet_id, rows=params.rows)
-        return ActionResult.ok({"items": rows, "count": len(rows)}, summary=f"Updated {len(rows)} row(s) in sheet {params.sheet_id}.")
+        return ActionResult.success({"items": rows, "count": len(rows)}, summary=f"Updated {len(rows)} row(s) in sheet {params.sheet_id}.")
     except Exception as e:
         return ActionResult.error(f"Error updating rows: {e}")
 
@@ -154,7 +154,7 @@ async def delete_rows(ctx, params: DeleteRowsParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         await client.delete_rows(sheet_id=params.sheet_id, row_ids=params.row_ids)
-        return ActionResult.ok({"success": True, "message": f"Deleted {len(params.row_ids)} row(s)."}, summary=f"Deleted {len(params.row_ids)} row(s) from sheet {params.sheet_id}.")
+        return ActionResult.success({"success": True, "message": f"Deleted {len(params.row_ids)} row(s)."}, summary=f"Deleted {len(params.row_ids)} row(s) from sheet {params.sheet_id}.")
     except Exception as e:
         return ActionResult.error(f"Error deleting rows: {e}")
 
@@ -170,7 +170,7 @@ async def list_workspaces(ctx, params: ListWorkspacesParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         workspaces = await client.list_workspaces()
-        return ActionResult.ok({"items": workspaces, "count": len(workspaces)}, summary=f"Found {len(workspaces)} workspace(s).")
+        return ActionResult.success({"items": workspaces, "count": len(workspaces)}, summary=f"Found {len(workspaces)} workspace(s).")
     except Exception as e:
         return ActionResult.error(f"Error listing workspaces: {e}")
 
@@ -186,7 +186,7 @@ async def get_workspace(ctx, params: GetWorkspaceParams) -> ActionResult:
     client = await resolve_client(ctx, params.connection_id)
     try:
         ws = await client.get_workspace(workspace_id=params.workspace_id)
-        return ActionResult.ok({"data": ws, "id": str(ws.get("id"))}, summary=f"Retrieved workspace {params.workspace_id}.")
+        return ActionResult.success({"data": ws, "id": str(ws.get("id"))}, summary=f"Retrieved workspace {params.workspace_id}.")
     except Exception as e:
         return ActionResult.error(f"Error getting workspace: {e}")
 
@@ -210,6 +210,6 @@ async def create_webhook(ctx, params: CreateWebhookParams) -> ActionResult:
             scope_object_id=params.scope_object_id,
             events=params.events
         )
-        return ActionResult.ok({"data": wh, "id": str(wh.get("id"))}, summary=f"Created webhook '{params.name}'.")
+        return ActionResult.success({"data": wh, "id": str(wh.get("id"))}, summary=f"Created webhook '{params.name}'.")
     except Exception as e:
         return ActionResult.error(f"Error creating webhook: {e}")

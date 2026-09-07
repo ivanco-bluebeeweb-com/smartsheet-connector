@@ -64,7 +64,7 @@ async def connect_smartsheet(ctx, params: ConnectSmartsheetParams) -> ActionResu
         "access_token": params.access_token
     })
     await _save_connections(ctx, conns)
-    return ActionResult.ok(
+    return ActionResult.success(
         {"id": conn_id, "label": label, "status": "connected"},
         summary=f"Successfully connected Smartsheet account '{label}'."
     )
@@ -83,7 +83,7 @@ async def list_connections(ctx, params: NoParams) -> ActionResult:
         {"id": c.get("id"), "label": c.get("label", "Smartsheet"), "status": "connected"}
         for c in conns
     ]
-    return ActionResult.ok(
+    return ActionResult.success(
         {"connections": items, "count": len(items)},
         summary=f"Found {len(items)} Smartsheet connection(s)."
     )
@@ -104,7 +104,7 @@ async def disconnect_smartsheet(ctx, params: DisconnectSmartsheetParams) -> Acti
     if len(updated) == len(conns):
         return ActionResult.error(f"Connection {params.connection_id} not found.")
     await _save_connections(ctx, updated)
-    return ActionResult.ok(
+    return ActionResult.success(
         {"success": True, "message": f"Connection {params.connection_id} removed."},
         summary=f"Disconnected Smartsheet connection {params.connection_id}."
     )
